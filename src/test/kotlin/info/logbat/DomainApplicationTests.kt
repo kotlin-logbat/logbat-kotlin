@@ -1,4 +1,4 @@
-package info.logbat.domain
+package info.logbat
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
