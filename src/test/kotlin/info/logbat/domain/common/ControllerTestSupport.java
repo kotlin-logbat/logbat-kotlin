@@ -5,7 +5,7 @@ import info.logbat.dev.presentation.CountTestController;
 import info.logbat.dev.service.CountTestService;
 import info.logbat.domain.log.application.LogService;
 import info.logbat.domain.log.presentation.LogController;
-import info.logbat.domain.project.application.AppService_ASIS;
+import info.logbat.domain.project.application.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -29,7 +29,7 @@ public abstract class ControllerTestSupport {
   protected LogService logService;
 
   @MockBean
-  protected AppService_ASIS appService;
+  protected AppService appService;
 
   @MockBean
   protected CountTestService countTestService;

@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository
 class AppRepository (
     private val jdbcTemplate: JdbcTemplate
 ){
-    fun getAppIdByToken(token: String): Long{
+    fun getAppIdByToken(token: String): Long?{
         val selectQuery = "SELECT id FROM apps WHERE app_key = UNHEX(REPLACE(?, '-', ''))"
-        return jdbcTemplate.queryForObject(selectQuery, Long::class.java, token).or(0)
+        return jdbcTemplate.queryForObject(selectQuery, Long::class.java, token)
     }
 }

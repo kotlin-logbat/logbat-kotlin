@@ -3,7 +3,6 @@ package info.logbat.domain.log.application;
 import info.logbat.common.event.EventProducer;
 import info.logbat.domain.log.domain.Log;
 import info.logbat.domain.log.presentation.payload.request.CreateLogRequest;
-import info.logbat.domain.project.application.AppService_ASIS;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
