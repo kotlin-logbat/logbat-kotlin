@@ -15,7 +15,6 @@ class AppController (
 ){
     @DeleteMapping("/{token}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun removeAppCache(@PathVariable("token") token:String){
-        appService.evictAppCache(token)
-    }
+    fun removeAppCache(@PathVariable("token") token:String)
+        = appService.evictAppCache(token)
 }
