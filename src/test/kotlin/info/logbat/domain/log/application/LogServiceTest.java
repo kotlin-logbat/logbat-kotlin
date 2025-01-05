@@ -2,7 +2,7 @@ package info.logbat.domain.log.application;
 
 import info.logbat.domain.log.presentation.payload.request.CreateLogRequest;
 import info.logbat.domain.log.repository.LogRepository;
-import info.logbat.domain.project.application.AppService;
+import info.logbat.domain.project.application.AppService_ASIS;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.InjectMocks;
@@ -28,7 +28,7 @@ class LogServiceTest {
     @Mock
     private LogRepository logRepository;
     @Mock
-    private AppService appService;
+    private AppService_ASIS appService;
 
     private final LocalDateTime expectedTimestamp = LocalDateTime.of(2021, 1, 1, 0, 0, 1);
     private final List<CreateLogRequest> expectedCreateLogRequest = List.of(

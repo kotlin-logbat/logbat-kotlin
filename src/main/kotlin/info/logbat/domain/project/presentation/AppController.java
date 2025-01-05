@@ -1,6 +1,6 @@
 package info.logbat.domain.project.presentation;
 
-import info.logbat.domain.project.application.AppService;
+import info.logbat.domain.project.application.AppService_ASIS;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AppController {
 
-    private final AppService appService;
+    private final AppService_ASIS appService;
 
     @DeleteMapping("/{token}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
