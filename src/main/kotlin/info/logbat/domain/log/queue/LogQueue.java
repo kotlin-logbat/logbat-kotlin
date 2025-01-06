@@ -1,7 +1,5 @@
 package info.logbat.domain.log.queue;
 
-import info.logbat.common.event.EventConsumer;
-import info.logbat.common.event.EventProducer;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;

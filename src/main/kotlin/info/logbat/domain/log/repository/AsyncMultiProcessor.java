@@ -1,7 +1,6 @@
 package info.logbat.domain.log.repository;
 
 import com.zaxxer.hikari.HikariDataSource;
-import info.logbat.common.event.EventProducer;
 import info.logbat.domain.log.queue.ReentrantLogQueue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;

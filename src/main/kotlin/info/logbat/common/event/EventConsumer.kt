@@ -1,8 +1,5 @@
-package info.logbat.common.event;
+package info.logbat.common.event
 
-import java.util.List;
-
-public interface EventConsumer<T> {
-
-    List<T> consume();
+interface EventConsumer<T> {
+    fun consume():List<T>
 }

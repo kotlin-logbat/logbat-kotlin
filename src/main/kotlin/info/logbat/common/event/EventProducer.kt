@@ -1,8 +1,5 @@
-package info.logbat.common.event;
+package info.logbat.common.event
 
-import java.util.List;
-
-public interface EventProducer<T> {
-
-    void produce(List<T> data);
+interface EventProducer<T> {
+    fun produce(data:List<T>):Unit
 }

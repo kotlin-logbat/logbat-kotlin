@@ -1,6 +1,5 @@
 package info.logbat.domain.log.application;
 
-import info.logbat.common.event.EventProducer;
 import info.logbat.domain.log.domain.Log;
 import info.logbat.domain.log.presentation.payload.request.CreateLogRequest;
 import lombok.RequiredArgsConstructor;

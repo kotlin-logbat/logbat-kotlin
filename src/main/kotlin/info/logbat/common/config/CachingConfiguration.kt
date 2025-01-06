@@ -15,7 +15,7 @@ class CachingConfiguration {
     @Bean
     fun cacheManager(): CacheManager {
         val cacheManager = SimpleCacheManager()
-        val caches = CacheType.values().map {
+        val caches = CacheType.entries.map {
             CaffeineCache(
                 it.cacheName,
                 Caffeine.newBuilder()
