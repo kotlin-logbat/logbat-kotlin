@@ -1,6 +1,5 @@
 package info.logbat.dev.presentation;
 
-import info.logbat.common.payload.ApiCommonResponse;
 import info.logbat.dev.presentation.payload.response.CountTestResponse;
 import info.logbat.dev.service.CountTestService;
 import lombok.RequiredArgsConstructor;

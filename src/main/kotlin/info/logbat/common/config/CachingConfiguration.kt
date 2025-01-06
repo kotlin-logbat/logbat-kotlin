@@ -1,25 +1,30 @@
-package info.logbat.common.config;
+package info.logbat.common.config
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import java.util.concurrent.TimeUnit;
+import com.github.benmanes.caffeine.cache.Caffeine
+import org.springframework.cache.CacheManager
+import org.springframework.cache.annotation.EnableCaching
+import org.springframework.cache.caffeine.CaffeineCache
+import org.springframework.cache.support.SimpleCacheManager
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import java.util.concurrent.TimeUnit
 
 @Configuration
 @EnableCaching
-public class CachingConfiguration {
-
+class CachingConfiguration {
     @Bean
-    public CacheManager cacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("app");
-        cacheManager.setCaffeine(Caffeine.newBuilder()
-            .maximumSize(100)
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-        );
-        return cacheManager;
+    fun cacheManager(): CacheManager {
+        val cacheManager = SimpleCacheManager()
+        val caches = CacheType.values().map {
+            CaffeineCache(
+                it.cacheName,
+                Caffeine.newBuilder()
+                    .expireAfterWrite(it.expireAfterWrite, it.timeUnit)
+                    .maximumSize(it.maximumSize)
+                    .build()
+            )
+        }
+        cacheManager.setCaches(caches)
+        return cacheManager
     }
 }

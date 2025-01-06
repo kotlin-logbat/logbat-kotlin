@@ -1,48 +1,25 @@
-package info.logbat.common.payload;
+package info.logbat.common.payload
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatus
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ApiCommonResponse<T> {
-
-    private int statusCode;
-    private String message;
-    private T data;
-
-    private ApiCommonResponse(int status, String message, T data) {
-        this.statusCode = status;
-        this.message = message;
-        this.data = data;
-    }
-
-    private ApiCommonResponse(int statusCode, String message) {
-        this.statusCode = statusCode;
-        this.message = message;
-    }
-
-    private ApiCommonResponse(int statusCode) {
-        this.statusCode = statusCode;
-    }
-
-    public static <T> ApiCommonResponse<T> createApiResponse(HttpStatus httpStatus, String message,
-        T data) {
-        return new ApiCommonResponse<>(httpStatus.value(), message, data);
-    }
-
-    public static ApiCommonResponse<Void> createFailResponse(HttpStatus httpStatus,
-        String message) {
-        return new ApiCommonResponse<>(httpStatus.value(), message);
-    }
-
-    public static ApiCommonResponse<Void> createSuccessResponse() {
-        return new ApiCommonResponse<>(HttpStatus.OK.value());
-    }
-
-    public static <T> ApiCommonResponse<T> createSuccessResponse(T data) {
-        return new ApiCommonResponse<>(HttpStatus.OK.value(), "Success", data);
+class ApiCommonResponse<T> (
+    private var statusCode : Int ,
+    private var message : String,
+    private var data : T
+){
+    companion object{
+        private const val SUCCESS = "Success"
+        fun <T> createApiResponse(httpStatus:HttpStatus, message:String, data:T): ApiCommonResponse<T>{
+            return ApiCommonResponse(httpStatus.value(), message, data)
+        }
+        fun createFailResponse(httpStatus:HttpStatus, message:String): ApiCommonResponse<Unit>{
+            return ApiCommonResponse(httpStatus.value(), message, Unit)
+        }
+        fun createSuccessResponse(): ApiCommonResponse<Unit>{
+            return ApiCommonResponse(HttpStatus.OK.value(), SUCCESS, Unit)
+        }
+        fun <T> createSuccessResponse(data:T): ApiCommonResponse<T>{
+            return ApiCommonResponse(HttpStatus.OK.value(), SUCCESS, data)
+        }
     }
 }
