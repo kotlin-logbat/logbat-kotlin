@@ -1,6 +1,7 @@
 package info.logbat.domain.log.repository;
 
 import com.zaxxer.hikari.HikariDataSource;
+import info.logbat.common.event.EventConsumer;
 import info.logbat.domain.log.domain.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -31,7 +32,7 @@ public class AsyncLogProcessor {
      * @param jdbcTemplate  JdbcTemplate 객체
      */
     public AsyncLogProcessor(EventConsumer<Log> eventConsumer,
-        JdbcTemplate jdbcTemplate) {
+                             JdbcTemplate jdbcTemplate) {
         DataSource dataSource = jdbcTemplate.getDataSource();
         if (!(dataSource instanceof HikariDataSource)) {
             throw new IllegalArgumentException("DataSource is null");

@@ -1,6 +1,7 @@
 package info.logbat.domain.log.repository;
 
 import com.zaxxer.hikari.HikariDataSource;
+import info.logbat.common.event.EventProducer;
 import info.logbat.domain.log.queue.ReentrantLogQueue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -23,7 +24,7 @@ import java.util.function.Consumer;
 @Component
 public class AsyncMultiProcessor<E> implements EventProducer<E> {
 
-    private final List<ReentrantLogQueue<E>> queues;
+    private final List<Reentrant<E>> queues;
     private final List<ExecutorService> flatterExecutors;
     private final List<ExecutorService> leaderExecutors;
     private Consumer<List<E>> saveFunction;
