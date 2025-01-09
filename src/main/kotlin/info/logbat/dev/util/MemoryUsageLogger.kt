@@ -9,10 +9,10 @@ import java.lang.management.MemoryMXBean
 
 @Component
 class MemoryUsageLogger {
-    companion object {
-        val logger: Logger = LoggerFactory.getLogger(MemoryUsageLogger::class.java)
-        val memoryMXBean: MemoryMXBean = ManagementFactory.getMemoryMXBean()
-    }
+//    companion object {
+    val logger: Logger = LoggerFactory.getLogger(MemoryUsageLogger::class.java)
+    val memoryMXBean: MemoryMXBean = ManagementFactory.getMemoryMXBean()
+//    }
     @Scheduled(fixedRate = 1000)
     fun logMemoryUsage() {
         val heapMemoryUsage = memoryMXBean.heapMemoryUsage
