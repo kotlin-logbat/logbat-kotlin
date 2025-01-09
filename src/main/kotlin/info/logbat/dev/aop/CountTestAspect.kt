@@ -16,11 +16,10 @@ class CountTestAspect (
     fun countTestPointcut(){}
 
     @Around("countTestPointcut()")
-    fun countTest(joinPoint: ProceedingJoinPoint): Any{
-        var proceed = joinPoint.proceed();
-        countTestService.increaseSuccessCount().runCatching {
-            countTestService.increaseErrorCount()
-        };
-        return proceed;
-    }
+    fun countTest(joinPoint: ProceedingJoinPoint):Any =
+        joinPoint.proceed().let{
+            countTestService.increaseSuccessCount().runCatching {
+                countTestService.increaseErrorCount()
+            }
+        }
 }
