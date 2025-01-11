@@ -1,40 +1,24 @@
-package info.logbat.dev.service;
+package info.logbat.dev.service
 
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Component
+import java.util.concurrent.atomic.LongAdder
 
-import java.util.concurrent.atomic.LongAdder;
-
-@Primary
 @Component
-public class LongAdderCountTestService implements CountTestService {
+class LongAdderCountTestService : CountTestService{
+    private val successCount = LongAdder()
+    private val errorCount = LongAdder()
 
-  private final LongAdder successCount = new LongAdder();
-  private final LongAdder errorCount = new LongAdder();
 
-  @Override
-  public void increaseSuccessCount() {
-    successCount.increment();
-  }
+    override fun increaseSuccessCount()  = successCount.increment()
 
-  @Override
-  public void increaseErrorCount() {
-    errorCount.increment();
-  }
+    override fun increaseErrorCount() = errorCount.increment()
 
-  @Override
-  public long getSuccessCount() {
-    return successCount.sum();
-  }
+    override fun getSuccessCount(): Long = successCount.sum()
 
-  @Override
-  public long getErrorCount() {
-    return errorCount.sum();
-  }
+    override fun getErrorCount(): Long = errorCount.sum();
 
-  @Override
-  public void reset() {
-    successCount.reset();
-    errorCount.reset();
-  }
+    override fun reset() {
+        successCount.reset()
+        errorCount.reset()
+    }
 }

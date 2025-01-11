@@ -1,38 +1,27 @@
-package info.logbat.dev.service;
+package info.logbat.dev.service
 
-import org.springframework.stereotype.Component;
-
-import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.stereotype.Component
+import java.util.concurrent.atomic.AtomicLong
 
 @Component
-public class SimpleCountTestService implements CountTestService {
+class SimpleCountTestService : CountTestService{
+    private val successCount = AtomicLong(0L)
+    private val errorCount = AtomicLong(0L)
 
-  private final AtomicLong successCount = new AtomicLong(0L);
-  private final AtomicLong errorCount = new AtomicLong(0L);
+    override fun increaseSuccessCount()  {
+        successCount.incrementAndGet()
+    }
 
-  @Override
-  public void increaseSuccessCount() {
-    successCount.incrementAndGet();
-  }
+    override fun increaseErrorCount() {
+        errorCount.incrementAndGet()
+    }
 
-  @Override
-  public void increaseErrorCount() {
-    errorCount.incrementAndGet();
-  }
+    override fun getSuccessCount(): Long = successCount.get()
 
-  @Override
-  public long getSuccessCount() {
-    return successCount.get();
-  }
+    override fun getErrorCount(): Long = errorCount.get();
 
-  @Override
-  public long getErrorCount() {
-    return errorCount.get();
-  }
-
-  @Override
-  public void reset() {
-    successCount.set(0L);
-    errorCount.set(0L);
-  }
+    override fun reset() {
+        successCount.set(0)
+        errorCount.set(0)
+    }
 }
