@@ -1,7 +1,6 @@
 package info.logbat.domain.log.application;
 
 import info.logbat.domain.log.presentation.payload.request.CreateLogRequest;
-import info.logbat.domain.log.repository.LogRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.InjectMocks;

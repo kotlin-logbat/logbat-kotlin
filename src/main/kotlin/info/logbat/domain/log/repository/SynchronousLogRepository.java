@@ -1,7 +1,6 @@
 package info.logbat.domain.log.repository;
 
 import info.logbat.domain.log.domain.Log;
-import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

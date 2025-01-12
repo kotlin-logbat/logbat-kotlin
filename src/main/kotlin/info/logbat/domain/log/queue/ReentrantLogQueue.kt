@@ -1,83 +1,64 @@
-package info.logbat.domain.log.queue;
+package info.logbat.domain.log.queue
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+import info.logbat.common.event.EventConsumer
+import info.logbat.common.event.EventProducer
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Scope
+import org.springframework.stereotype.Component
+import java.util.LinkedList
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.Condition
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 @Scope("prototype")
 @Component
-public class ReentrantLogQueue<T> implements EventProducer<T>, EventConsumer<T> {
+class ReentrantLogQueue<T>(
+    @Value("\${jdbc.async.timeout}") private val timeout: Long,
+    @Value("\${jdbc.async.bulk-size}") private val bulkSize: Int
+) : EventProducer<T>, EventConsumer<T> {
 
-    private final LinkedList<T> queue = new LinkedList<>();
-    private final long timeout;
-    private final int bulkSize;
-    private final ReentrantLock bulkLock = new ReentrantLock();
-    private final Condition bulkCondition = bulkLock.newCondition();
-
-    public ReentrantLogQueue(@Value("${jdbc.async.timeout}") Long timeout,
-        @Value("${jdbc.async.bulk-size}") Integer bulkSize) {
-        this.timeout = timeout;
-        this.bulkSize = bulkSize;
-    }
-
-    /*
+    private val queue = LinkedList<T>()
+    private val bulkLock = ReentrantLock()
+    private val bulkCondition: Condition = bulkLock.newCondition()
+    /**
      * Consumer should be one thread
      */
-    @Override
-    public List<T> consume() {
-        List<T> result = new ArrayList<>();
-
-        try {
-            bulkLock.lockInterruptibly();
-            // Case1: Full Flush
-            if (queue.size() >= bulkSize) {
-                for (int i = 0; i < bulkSize; i++) {
-                    result.add(queue.poll());
+    override fun consume(): List<T> {
+        val result = mutableListOf<T>()
+        bulkLock.withLock {
+            try {
+                // Case 1: Full Flush
+                if (queue.size >= bulkSize) {
+                    repeat(bulkSize) {
+                        result.add(queue.poll())
+                    }
+                    return result
                 }
-                return result;
-            }
-            // Else Case: Blocking
-            // Blocked while Queue is Not Empty
-            do {
-                bulkCondition.await(timeout, TimeUnit.MILLISECONDS);
-            } while (queue.isEmpty());
+                // Case 2: Blocking
+                do {
+                    bulkCondition.awaitNanos(TimeUnit.MILLISECONDS.toNanos(timeout))
+                } while (queue.isEmpty())
 
-            // Bulk Size 만큼 꺼내서 반환
-            for (int i = 0; i < bulkSize; i++) {
-                result.add(queue.poll());
-                if (queue.isEmpty()) {
-                    break;
+                // Retrieve up to `bulkSize` elements
+                repeat(bulkSize) {
+                    result.add(queue.poll() ?: return@repeat)
                 }
+            } catch (e: InterruptedException) {
+                throw RuntimeException(e)
             }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } finally {
-            bulkLock.unlock();
         }
-        return result;
+        return result
     }
-
-    /*
+    /**
      * Producer should be one thread
      */
-    @Override
-    public void produce(List<T> data) {
-        bulkLock.lock();
-        try {
-            queue.addAll(data);
-            if (queue.size() >= bulkSize) {
-                bulkCondition.signal();
+    override fun produce(data: List<T>) {
+        bulkLock.withLock {
+            queue.addAll(data)
+            if (queue.size >= bulkSize) {
+                bulkCondition.signal()
             }
-        } finally {
-            bulkLock.unlock();
         }
     }
-
 }

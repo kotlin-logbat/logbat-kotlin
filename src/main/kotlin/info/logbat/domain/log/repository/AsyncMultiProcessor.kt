@@ -1,89 +1,90 @@
-package info.logbat.domain.log.repository;
+package info.logbat.domain.log.repository
 
-import com.zaxxer.hikari.HikariDataSource;
-import info.logbat.common.event.EventProducer;
-import info.logbat.domain.log.queue.ReentrantLogQueue;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import com.zaxxer.hikari.HikariDataSource
+import info.logbat.common.event.EventProducer
+import info.logbat.domain.log.queue.ReentrantLogQueue
+import jakarta.annotation.PostConstruct
+import kotlinx.coroutines.*
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.ObjectProvider
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Primary
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.stereotype.Component
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.util.concurrent.ThreadLocalRandom
+import kotlin.coroutines.coroutineContext
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
-
-@Slf4j
 @Primary
 @Component
-public class AsyncMultiProcessor<E> implements EventProducer<E> {
+class AsyncMultiProcessor<E>(
+    @Value("\${queue.count:3}") private val queueCount: Int,
+    @Value("\${jdbc.async.timeout:5000}") private val timeout: Long,
+    @Value("\${jdbc.async.bulk-size:3000}") private val bulkSize: Int,
+    jdbcTemplate: JdbcTemplate,
+    private val objectProvider: ObjectProvider<ReentrantLogQueue<E>>
+) : EventProducer<E> {
 
-    private final List<Reentrant<E>> queues;
-    private final List<ExecutorService> flatterExecutors;
-    private final List<ExecutorService> leaderExecutors;
-    private Consumer<List<E>> saveFunction;
-    private final int queueCount;
-    private final ObjectProvider<ReentrantLogQueue<E>> objectProvider;
+    private val queues: MutableList<ReentrantLogQueue<E>> = mutableListOf()
+    private val saveFunctionMutex = Mutex()
+    private lateinit var saveFunction: suspend (List<E>) -> Unit
+    private val scope = CoroutineScope(Dispatchers.Default)
+    private val log = LoggerFactory.getLogger(AsyncMultiProcessor::class.java)
 
-    public AsyncMultiProcessor(@Value("${queue.count:3}") int queueCount,
-        @Value("${jdbc.async.timeout:5000}") Long timeout,
-        @Value("${jdbc.async.bulk-size:3000}") Integer bulkSize, JdbcTemplate jdbcTemplate,
-        ObjectProvider<ReentrantLogQueue<E>> objectProvider) {
-        this.queueCount = queueCount;
-        this.queues = new ArrayList<>(queueCount);
-        this.leaderExecutors = new ArrayList<>(queueCount);
-        this.flatterExecutors = new ArrayList<>(queueCount);
-        this.objectProvider = objectProvider;
-        int poolSize = getPoolSize(jdbcTemplate);
-        setup(queueCount, timeout, bulkSize, poolSize);
+    init {
+        val poolSize = getPoolSize(jdbcTemplate)
+        setup(queueCount, timeout, bulkSize, poolSize)
     }
 
-    public void init(Consumer<List<E>> saveFunction) {
-        this.saveFunction = saveFunction;
+    @PostConstruct
+    fun initSaveFunction() {
+        saveFunction = { throw IllegalStateException("saveFunction not initialized") }
     }
 
-    @Override
-    public void produce(List<E> data) {
-        if (data.isEmpty()) {
-            return;
-        }
-        int selectedQueue = ThreadLocalRandom.current().nextInt(queueCount);
-        flatterExecutors.get(selectedQueue).execute(() -> queues.get(selectedQueue).produce(data));
+    fun init(saveFunction: suspend (List<E>) -> Unit) {
+        this.saveFunction = saveFunction
     }
 
-    private void setup(int queueCount, Long timeout, Integer bulkSize, int poolSize) {
-        for (int i = 0; i < queueCount; i++) {
-            ReentrantLogQueue<E> queue = objectProvider.getObject(timeout, bulkSize);
-            queues.add(queue);
-            
-            ExecutorService leaderExecutor = Executors.newFixedThreadPool(poolSize);
-            leaderExecutors.add(leaderExecutor);
-            flatterExecutors.add(Executors.newSingleThreadExecutor());
-
-            CompletableFuture.runAsync(() -> leaderTask(queue, leaderExecutor));
+    override fun produce(data: List<E>) {
+        if (data.isEmpty()) return
+        val selectedQueue = ThreadLocalRandom.current().nextInt(queueCount)
+        scope.launch {
+            queues[selectedQueue].produce(data)
         }
     }
 
-    private void leaderTask(ReentrantLogQueue<E> queue, ExecutorService follower) {
-        while (!Thread.currentThread().isInterrupted()) {
-            List<E> element = queue.consume();
-            follower.execute(() -> saveFunction.accept(element));
+    private fun setup(queueCount: Int, timeout: Long, bulkSize: Int, poolSize: Int) {
+        repeat(queueCount) {
+            val queue = objectProvider.getObject(timeout, bulkSize)
+            queues.add(queue)
+            scope.launch {
+                leaderTask(queue)
+            }
         }
     }
 
-    private static int getPoolSize(JdbcTemplate jdbcTemplate) {
-        DataSource dataSource = jdbcTemplate.getDataSource();
-        if (!(dataSource instanceof HikariDataSource)) {
-            throw new IllegalArgumentException("DataSource is null");
+    private suspend fun leaderTask(queue: ReentrantLogQueue<E>) {
+        while (coroutineContext.isActive) {
+            val element = withContext(Dispatchers.IO) {
+                queue.consume()
+            }
+            withContext(Dispatchers.IO) {
+                saveFunctionMutex.withLock {
+                    saveFunction(element)
+                }
+            }
         }
-        int poolSize = ((HikariDataSource) dataSource).getMaximumPoolSize();
-        log.debug("Creating AsyncLogProcessor with pool size: {}", poolSize);
-        return poolSize * 5 / 10;
+    }
+
+    private fun getPoolSize(jdbcTemplate: JdbcTemplate): Int {
+        val dataSource = jdbcTemplate.dataSource
+            ?: throw IllegalArgumentException("DataSource is null")
+        if (dataSource !is HikariDataSource) {
+            throw IllegalArgumentException("Expected HikariDataSource but got ${dataSource::class.simpleName}")
+        }
+        val poolSize = dataSource.maximumPoolSize
+        log.debug("Creating AsyncMultiProcessor with pool size: {}", poolSize)
+        return (poolSize * 5) / 10
     }
 }
