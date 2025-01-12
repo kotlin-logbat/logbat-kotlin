@@ -1,7 +1,6 @@
 package info.logbat.domain.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import info.logbat.dev.service.CountTestService;
 import info.logbat.domain.log.application.LogService;
 import info.logbat.domain.log.presentation.LogController;
 import info.logbat.domain.project.application.AppService;
