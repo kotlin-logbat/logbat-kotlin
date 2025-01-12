@@ -2,7 +2,6 @@ package info.logbat.domain.log.repository;
 
 import com.zaxxer.hikari.HikariDataSource;
 import info.logbat.common.event.EventConsumer;
-import info.logbat.domain.log.domain.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 

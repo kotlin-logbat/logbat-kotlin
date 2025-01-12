@@ -1,6 +1,5 @@
 package info.logbat.domain.log.flatter;
 
-import info.logbat.domain.log.domain.Log;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -1,24 +1,18 @@
-package info.logbat.domain.log.domain.values;
+package info.logbat.domain.log.domain.values
 
-import lombok.Getter;
+data class LogData private constructor(val value: String) {
 
-@Getter
-public class LogData {
-
-  private final String value;
-
-  public static LogData from(String data) {
-    return new LogData(data);
-  }
-
-  private LogData(String data) {
-    validateData(data);
-    this.value = data;
-  }
-
-  private void validateData(String data) {
-    if (data == null) {
-      throw new IllegalArgumentException("log data는 null일 수 없습니다.");
+    companion object {
+        fun from(data: String): LogData {
+            return LogData(data)
+        }
     }
-  }
+
+    init {
+        validateData(value)
+    }
+
+    private fun validateData(data: String) {
+        require(data.isNotEmpty()) { "log data는 null일 수 없고 빈 문자열일 수 없습니다." }
+    }
 }

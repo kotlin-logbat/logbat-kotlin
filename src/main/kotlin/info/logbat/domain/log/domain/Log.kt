@@ -1,57 +1,40 @@
-package info.logbat.domain.log.domain;
+package info.logbat.domain.log.domain
 
-import info.logbat.domain.log.domain.enums.Level;
-import info.logbat.domain.log.domain.values.LogData;
-import lombok.Getter;
+import info.logbat.domain.log.domain.enums.Level
+import info.logbat.domain.log.domain.values.LogData
+import java.time.LocalDateTime
 
-import java.time.LocalDateTime;
-
-@Getter
-public class Log {
-
-    private final Long id;
-    private final Long appId;
-    private final Level level;
-    private final LogData data;
-    private final LocalDateTime timestamp;
-
-    public static Log of(Long appId, String level, String logData, LocalDateTime timestamp) {
-        return new Log(appId, level, logData, timestamp);
+data class Log(
+    val id: Long? = null,
+    val appId: Long,
+    val level: Level,
+    val data: LogData,
+    val timestamp: LocalDateTime
+) {
+    init {
+        validateAppId(appId)
+        validateTimestamp(timestamp)
     }
 
-    public Log(Long appId, String level, String data, LocalDateTime timestamp) {
-        this(null, appId, level, data, timestamp);
-    }
-
-    public Log(Long id, Long appId, Integer level, String data, LocalDateTime timestamp) {
-        this.id = id;
-        validateAppId(appId);
-        this.appId = appId;
-        this.level = Level.from(level);
-        this.data = LogData.from(data);
-        validateTimestamp(timestamp);
-        this.timestamp = timestamp;
-    }
-
-    public Log(Long id, Long appId, String level, String data, LocalDateTime timestamp) {
-        this.id = id;
-        validateAppId(appId);
-        this.appId = appId;
-        this.level = Level.from(level);
-        this.data = LogData.from(data);
-        validateTimestamp(timestamp);
-        this.timestamp = timestamp;
-    }
-
-    private void validateAppId(Long appId) {
-        if (appId == null || appId <= 0) {
-            throw new IllegalArgumentException("appId는 null일 수 없고 0보다 커야 합니다.");
+    companion object {
+        fun of(appId: Long, level: String, logData: String, timestamp: LocalDateTime): Log {
+            return Log(appId = appId, level = Level.from(level), data = LogData.from(logData), timestamp = timestamp)
         }
     }
 
-    private void validateTimestamp(LocalDateTime timestamp) {
-        if (timestamp == null) {
-            throw new IllegalArgumentException("timestamp는 null이 될 수 없습니다.");
-        }
+    constructor(appId: Long, level: String, data: String, timestamp: LocalDateTime) : this(
+        id = null,
+        appId = appId,
+        level = Level.from(level),
+        data = LogData.from(data),
+        timestamp = timestamp
+    )
+
+    private fun validateAppId(appId: Long) {
+        require(appId > 0) { "appId는 null일 수 없고 0보다 커야 합니다." }
+    }
+
+    private fun validateTimestamp(timestamp: LocalDateTime) {
+        requireNotNull(timestamp) { "timestamp는 null이 될 수 없습니다." }
     }
 }
