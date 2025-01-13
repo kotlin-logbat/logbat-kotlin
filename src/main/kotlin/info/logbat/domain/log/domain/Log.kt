@@ -13,7 +13,7 @@ data class Log(
 ) {
     init {
         validateAppId(appId)
-        validateTimestamp(timestamp)
+//        validateTimestamp(timestamp)
     }
 
     companion object {
@@ -34,7 +34,7 @@ data class Log(
         require(appId > 0) { "appId는 null일 수 없고 0보다 커야 합니다." }
     }
 
-    private fun validateTimestamp(timestamp: LocalDateTime) {
-        requireNotNull(timestamp) { "timestamp는 null이 될 수 없습니다." }
-    }
+//    private fun validateTimestamp(timestamp: LocalDateTime?) {
+//        requireNotNull(timestamp) { "timestamp는 null이 될 수 없습니다." }
+//    }
 }
