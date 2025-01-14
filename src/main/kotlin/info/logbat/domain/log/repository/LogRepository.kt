@@ -5,5 +5,5 @@ import info.logbat.domain.log.domain.Log
 
 interface LogRepository {
     fun save(log: Log):Long
-    fun fundById(logId: Long):Log?
+    fun findById(logId: Long):Log?
 }

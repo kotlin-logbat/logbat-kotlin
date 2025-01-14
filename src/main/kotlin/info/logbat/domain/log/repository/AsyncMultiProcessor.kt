@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Component
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.springframework.context.annotation.Lazy
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.coroutines.coroutineContext
 

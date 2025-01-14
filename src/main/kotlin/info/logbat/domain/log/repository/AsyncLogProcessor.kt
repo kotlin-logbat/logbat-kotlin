@@ -29,4 +29,8 @@ class AsyncLogProcessor (
             }
         }
     }
+
+    fun submitLog(expectedLog: Log) {
+
+    }
 }

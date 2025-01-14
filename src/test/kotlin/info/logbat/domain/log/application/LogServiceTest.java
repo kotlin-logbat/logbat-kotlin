@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 class LogServiceTest {
 
     @InjectMocks
-    private LogService logService;
+    private LogService2 logService;
 
     @Mock
     private LogRepository logRepository;

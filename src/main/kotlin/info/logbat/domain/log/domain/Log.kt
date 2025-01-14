@@ -17,6 +17,7 @@ data class Log(
     }
 
     companion object {
+        @JvmStatic
         fun of(appId: Long, level: String, logData: String, timestamp: LocalDateTime): Log {
             return Log(appId = appId, level = Level.from(level), data = LogData.from(logData), timestamp = timestamp)
         }

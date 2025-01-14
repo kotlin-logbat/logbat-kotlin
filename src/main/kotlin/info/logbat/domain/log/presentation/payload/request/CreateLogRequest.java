@@ -1,5 +1,6 @@
 package info.logbat.domain.log.presentation.payload.request;
 
+import info.logbat.domain.log.domain.Log;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

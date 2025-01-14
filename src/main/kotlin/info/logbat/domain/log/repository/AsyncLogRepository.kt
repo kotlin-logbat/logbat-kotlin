@@ -31,7 +31,7 @@ class AsyncLogRepository(
         return DEFAULT_RETURNS
     }
 
-    override fun fundById(logId: Long): Log? {
+    override fun findById(logId: Long): Log? {
         val sql = "SELECT * FROM logs WHERE id = ?"
         return try {
             jdbcTemplate.queryForObject(sql, logRowMapper, logId)

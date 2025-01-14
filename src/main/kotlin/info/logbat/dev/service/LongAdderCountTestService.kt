@@ -1,8 +1,10 @@
 package info.logbat.dev.service
 
+import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 import java.util.concurrent.atomic.LongAdder
 
+@Primary
 @Component
 class LongAdderCountTestService : CountTestService{
     private val successCount = LongAdder()

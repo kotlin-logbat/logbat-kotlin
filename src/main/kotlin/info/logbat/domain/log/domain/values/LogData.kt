@@ -3,6 +3,7 @@ package info.logbat.domain.log.domain.values
 data class LogData private constructor(val value: String) {
 
     companion object {
+        @JvmStatic
         fun from(data: String): LogData {
             return LogData(data)
         }
