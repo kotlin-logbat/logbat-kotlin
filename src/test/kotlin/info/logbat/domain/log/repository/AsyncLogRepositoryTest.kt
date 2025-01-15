@@ -25,6 +25,9 @@ class AsyncLogRepositoryTest {
     @Mock
     private lateinit var asyncLogProcessor: AsyncLogProcessor
 
+    @Mock
+    private lateinit var asyncMultiProcessor: AsyncMultiProcessor<Log>
+
     private lateinit var asyncLogRepository: AsyncLogRepository
 
     private val expectedLogId: Long = 1L
@@ -38,21 +41,21 @@ class AsyncLogRepositoryTest {
 
     @BeforeEach
     fun setUp() {
-        asyncLogRepository = AsyncLogRepository(jdbcTemplate, asyncLogProcessor)
+        asyncLogRepository = AsyncLogRepository(jdbcTemplate, asyncMultiProcessor)
     }
 
     @Test
     @DisplayName("로그를 정상적으로 저장할 수 있다.")
     fun testSave() {
         // Arrange
-        doNothing().`when`(asyncLogProcessor).submitLog(expectedLog)
+        doNothing().`when`(asyncMultiProcessor).submitLog(expectedLog)
 
         // Act
         val actualResult = asyncLogRepository.save(expectedLog)
 
         // Assert
         assertThat(actualResult).isZero()
-        verify(asyncLogProcessor).submitLog(expectedLog)
+        verify(asyncMultiProcessor).submitLog(expectedLog)
     }
 
     @Nested

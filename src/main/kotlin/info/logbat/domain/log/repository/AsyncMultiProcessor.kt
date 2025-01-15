@@ -2,6 +2,7 @@ package info.logbat.domain.log.repository
 
 import com.zaxxer.hikari.HikariDataSource
 import info.logbat.common.event.EventProducer
+import info.logbat.domain.log.domain.Log
 import info.logbat.domain.log.queue.ReentrantLogQueue
 import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.*
@@ -87,5 +88,9 @@ class AsyncMultiProcessor<E>(
         val poolSize = dataSource.maximumPoolSize
         log.debug("Creating AsyncMultiProcessor with pool size: {}", poolSize)
         return (poolSize * 5) / 10
+    }
+
+    fun submitLog(expectedLog: Log) {
+
     }
 }
