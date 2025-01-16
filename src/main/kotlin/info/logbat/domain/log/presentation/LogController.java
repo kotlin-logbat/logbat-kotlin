@@ -2,7 +2,6 @@ package info.logbat.domain.log.presentation;
 
 import info.logbat.dev.aop.CountTest;
 import info.logbat.domain.log.application.LogService;
-import info.logbat.domain.log.presentation.payload.request.CreateLogRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.http.HttpStatus;
