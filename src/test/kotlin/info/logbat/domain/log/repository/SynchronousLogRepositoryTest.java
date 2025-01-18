@@ -1,7 +1,5 @@
 package info.logbat.domain.log.repository;
 
-import info.logbat.domain.log.domain.Log;
-import info.logbat.domain.log.domain.enums.Level;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

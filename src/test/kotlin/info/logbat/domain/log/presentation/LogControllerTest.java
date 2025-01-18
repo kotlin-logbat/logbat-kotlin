@@ -1,7 +1,6 @@
 package info.logbat.domain.log.presentation;
 
 import info.logbat.domain.common.ControllerTestSupport;
-import info.logbat.domain.log.presentation.payload.request.CreateLogRequest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;

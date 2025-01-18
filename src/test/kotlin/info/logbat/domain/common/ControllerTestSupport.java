@@ -3,8 +3,6 @@ package info.logbat.domain.common;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import info.logbat.dev.presentation.CountTestController;
 import info.logbat.dev.service.CountTestService;
-import info.logbat.domain.log.application.LogService;
-import info.logbat.domain.log.presentation.LogController;
 import info.logbat.domain.project.application.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,7 +24,7 @@ public abstract class ControllerTestSupport {
   protected ObjectMapper objectMapper;
 
   @MockBean
-  protected LogService logService;
+  protected LogService2 logService;
 
   @MockBean
   protected AppService appService;
