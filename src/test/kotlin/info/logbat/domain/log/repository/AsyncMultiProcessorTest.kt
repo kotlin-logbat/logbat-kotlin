@@ -11,6 +11,7 @@ import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.jdbc.core.JdbcTemplate
+import org.assertj.core.api.Assertions.assertThat
 
 @ExtendWith(MockitoExtension::class)
 @DisplayName("AsyncMultiProcessorTest는")
@@ -25,9 +26,6 @@ class AsyncMultiProcessorTest{
 
     private lateinit var asyncMultiProcessor: AsyncMultiProcessor<Log>
 
-    fun suspend mockProvidor(){
-
-    }
 
     @BeforeEach
     fun setUp() {
@@ -37,7 +35,10 @@ class AsyncMultiProcessorTest{
     @Test
     @DisplayName("잘 생성된다.")
     fun initTest(){
-        assertThat(asyncMultiProcessor.init(mockProvidor)).isTrue
+        val suspendFun = {data:List<Log> ->
+            println(data)
+        }
+        assertThat(asyncMultiProcessor.init { suspendFun }).isNotNull
     }
 
 
