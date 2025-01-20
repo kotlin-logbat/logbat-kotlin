@@ -49,21 +49,27 @@ class AsyncMultiProcessorTest{
         timestamp = LocalDateTime.of(2021, 1, 1, 0, 0, 0)
     )
 
-    private lateinit var expectedRetrant: ReentrantLogQueue<Log>
+    @Mock
+    private lateinit var reentrantLogQueue: ReentrantLogQueue<Log>
 
     @BeforeEach
     fun setUp() {
         val mockDataSource = mock(HikariDataSource::class.java)
         jdbcTemplate = spy(JdbcTemplate(mockDataSource))
         asyncMultiProcessor = AsyncMultiProcessor(3,5000,3000,jdbcTemplate, objectProvider)
+
     }
 
     @Test
     @DisplayName("잘 생성된다.")
     fun initTest(){
+        `when`(reentrantLogQueue.consume()).thenReturn(listOf(expectedLog))
+        `when`(objectProvider.getObject(anyLong(), anyInt())).thenReturn(reentrantLogQueue)
+
         var suspendFun = mock(MySuspendMockFun::class.java)
+
         given(objectProvider.getObject())
-            .willReturn(expectedRetrant)
+            .willReturn(reentrantLogQueue)
         assertThat(asyncMultiProcessor.init { suspendFun }).isNotNull
     }
 
